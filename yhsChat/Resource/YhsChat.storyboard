@@ -47,7 +47,7 @@
         <!--群组-->
         <scene sceneID="alO-ZI-75b">
             <objects>
-                <viewController id="Mkj-Gk-6o2" customClass="GroupViewController" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="Mkj-Gk-6o2" customClass="GroupViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Rcp-sF-bho"/>
                         <viewControllerLayoutGuide type="bottom" id="3Gc-eL-SC4"/>
@@ -76,6 +76,8 @@
                     <navigationItem key="navigationItem" title="群组" id="k1P-Iw-Pl9"/>
                     <connections>
                         <outlet property="tableView" destination="c5B-aC-WIn" id="G1e-DK-4tf"/>
+                        <segue destination="E0d-yg-NGi" kind="push" identifier="applyFriend" id="PAJ-Ed-GUK"/>
+                        <segue destination="zPC-1H-g1O" kind="push" identifier="groupToChat" id="sWN-6G-ISm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="P2C-wH-fWe" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -110,17 +112,51 @@
                     <navigationItem key="navigationItem" title="消息" id="DsO-Tl-5AZ"/>
                     <connections>
                         <outlet property="tableView" destination="Y0g-59-fxl" id="ADg-Y5-QoM"/>
-                        <segue destination="zPC-1H-g1O" kind="push" id="MFo-yX-JaV"/>
+                        <segue destination="zPC-1H-g1O" kind="push" identifier="MessageToChat" id="MFo-yX-JaV"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="F6T-p7-EmJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="965" y="1806"/>
         </scene>
+        <!--好友请求-->
+        <scene sceneID="T30-iU-cXM">
+            <objects>
+                <viewController title="好友请求" id="E0d-yg-NGi" customClass="ApplyFriendViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="SKL-Fu-nkc"/>
+                        <viewControllerLayoutGuide type="bottom" id="DeK-YZ-gea"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="7H6-R5-IDC">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="VDp-3W-AYW">
+                                <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="DeK-YZ-gea" firstAttribute="top" secondItem="VDp-3W-AYW" secondAttribute="bottom" id="8FQ-Ci-oBh"/>
+                            <constraint firstItem="VDp-3W-AYW" firstAttribute="top" secondItem="SKL-Fu-nkc" secondAttribute="bottom" id="OD8-C1-zbs"/>
+                            <constraint firstAttribute="trailing" secondItem="VDp-3W-AYW" secondAttribute="trailing" id="eVe-vO-OQB"/>
+                            <constraint firstItem="VDp-3W-AYW" firstAttribute="leading" secondItem="7H6-R5-IDC" secondAttribute="leading" id="zjQ-pY-ZLO"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="8vT-ZK-TDl"/>
+                    <connections>
+                        <outlet property="tableView" destination="VDp-3W-AYW" id="yFy-G7-2Ff"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="IAf-A8-Kxf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="602" y="2527"/>
+        </scene>
         <!--姓名-->
         <scene sceneID="tMf-Au-zIn">
             <objects>
-                <viewController hidesBottomBarWhenPushed="YES" id="zPC-1H-g1O" sceneMemberID="viewController">
+                <viewController hidesBottomBarWhenPushed="YES" id="zPC-1H-g1O" customClass="ChatViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="dV1-bQ-3us"/>
                         <viewControllerLayoutGuide type="bottom" id="G4a-Ux-OPB"/>
@@ -158,6 +194,9 @@
                                             <constraint firstAttribute="width" constant="30" id="rOk-oD-q9m"/>
                                         </constraints>
                                         <state key="normal" title="➕"/>
+                                        <connections>
+                                            <action selector="imput:" destination="zPC-1H-g1O" eventType="touchUpInside" id="oTW-1I-qAT"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wip-QZ-Nl2">
                                         <rect key="frame" x="249" y="11" width="30" height="30"/>
@@ -195,6 +234,10 @@
                     </view>
                     <navigationItem key="navigationItem" title="姓名" id="7Z9-eF-A4M"/>
                     <nil key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="tableView" destination="29I-kc-QJO" id="XYu-xj-RW6"/>
+                        <outlet property="textField" destination="pHn-n5-V9t" id="si2-WY-ddW"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BGQ-Yf-waF" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -455,4 +498,7 @@
             <point key="canvasLocation" x="965" y="1073"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="MFo-yX-JaV"/>
+    </inferredMetricsTieBreakers>
 </document>

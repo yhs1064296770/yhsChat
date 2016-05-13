@@ -7,12 +7,18 @@
 //
 
 #import "GroupViewController.h"
+#import "ApplyFriendViewController.h"
+#import "ChatViewController.h"
+#import "ApplyFriend.h"
 #import "GroupView.h"
+#import "UserInfo.h"
 #import "EMSDK.h"
 
 @interface GroupViewController ()<UITableViewDataSource,UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic ,strong)NSArray *userlist;
+@property (nonatomic ,strong)NSArray *applyFriend;
+@property (nonatomic ,strong)NSString *friendName;
 @end
 
 @implementation GroupViewController
@@ -21,12 +27,12 @@
     [super viewDidLoad];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    [[EMClient sharedClient].contactManager addDelegate:self delegateQueue:nil];
+    //注册好友回调
     
     self.tableView.tableHeaderView = [[GroupView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 70) clickHandler:^(NSInteger num) {
         NSLog(@"111");
     }];
-    self.userlist = [NSArray arrayWithArray:[[EMClient sharedClient].contactManager getContactsFromServerWithError:nil]];
+//    self.userlist = [NSArray arrayWithArray:[[EMClient sharedClient].contactManager getContactsFromServerWithError:nil]];
     NSArray *userlist1 = [[EMClient sharedClient].contactManager getContactsFromDB];
     NSLog(@"%@",userlist1);
     [self setNavigation:@"群组" rightButton:@"➕" andNeedLeftButton:NO];
@@ -54,18 +60,27 @@
     [alertController addAction:okAction];
     [self presentViewController:alertController animated:YES completion:nil];
 }
+
 - (void)didReceiveFriendInvitationFromUsername:(NSString *)aUsername
                                        message:(NSString *)aMessage{
+    NSLog(@"%@,%@",aUsername,aMessage);
     
+    [[EMClient sharedClient].contactManager removeDelegate:self];
 }
 
 #pragma mark --  UITableViewDataSource,UITableViewDelegate
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return 1;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    if (section == 0) {
+        return self.applyFriend.count;
+    }
+    if (section == 1) {
+        return self.userlist.count;
+    }
     return self.userlist.count;
 }
 
@@ -74,8 +89,72 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
     }
+    if (indexPath.section == 0) {
+        ApplyFriend *friend = [ApplyFriend new];
+        friend = self.applyFriend[indexPath.row];
+        cell.textLabel.text = friend.name;
+    }
+    if (indexPath.section == 1) {
+        cell.textLabel.text = self.userlist[indexPath.row];
+    }
     return cell;
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (indexPath.section == 0) {
+        [self performSegueWithIdentifier:@"applyFriend" sender:self];
+    }
+    
+    if (indexPath.section == 1) {
+        [self performSegueWithIdentifier:@"groupToChat" sender:self];
+        self.friendName =self.userlist[indexPath.row];
+    }
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // segue.identifier：获取连线的ID
+    if ([segue.identifier isEqualToString:@"applyFriend"]) {
+        // segue.destinationViewController：获取连线时所指的界面（VC）
+        ApplyFriendViewController *receive = segue.destinationViewController;
+        receive.applyFriends = self.applyFriend;
+        // 这里不需要指定跳转了，因为在按扭的事件里已经有跳转的代码
+        //		[self.navigationController pushViewController:receive animated:YES];
+    }
+    if ([segue.identifier isEqualToString:@"groupToChat"]) {
+        ChatViewController *receive = segue.destinationViewController;
+        receive.titleName = self.friendName;
+    }
+}
+
+- (NSArray *)applyFriend {
+	if(_applyFriend == nil) {
+        FMResultSet *set = [[UserInfo sharedUserInfo].db executeQuery:@"select * from t_friend_apply "];
+        NSMutableArray *mutArr = [NSMutableArray array];
+        while ([set next]) {
+            ApplyFriend *friend = [ApplyFriend new];
+            NSString *name =  [set stringForColumn:@"name"];
+            NSString *message = [set stringForColumn:@"message"];
+            NSLog(@"name : %@ message: %@",name,message);
+            friend.name = name;
+            friend.message = message;
+            [mutArr addObject:friend];
+        }
+		_applyFriend = [mutArr copy];
+	}
+	return _applyFriend;
+}
+
+- (NSArray *)userlist {
+	if(_userlist == nil) {
+        FMResultSet *set = [[UserInfo sharedUserInfo].db executeQuery:@"select * from t_friend"];
+        NSMutableArray *mutArr = [NSMutableArray array];
+        while ([set next]) {
+            NSString *name =  [set stringForColumn:@"name"];
+            [mutArr addObject:name];
+        }
+        _userlist = [mutArr copy];
+	}
+	return _userlist;
+}
 
 @end
